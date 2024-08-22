@@ -3815,6 +3815,9 @@ int init_nvram(void)
 #if 0
 	conf_swmode_support(model);
 #endif
+#ifdef RTCONFIG_OPENVPN
+	nvram_set("vpn_upload_state", "");
+#endif
 #ifdef RTCONFIG_SSH
 	if(nvram_get_int("sshd_port")>0 && nvram_get_int("sshd_port_x")<=0)
 		nvram_set("sshd_port_x", nvram_safe_get("sshd_port"));
@@ -3872,7 +3875,6 @@ int init_nvram(void)
 		nvram_set("lan_ipaddr", nvram_safe_get("lan_ipaddr_rt"));
 		nvram_set("lan_netmask", nvram_safe_get("lan_netmask_rt"));
 	}
-	ovpn_defaults();
 #endif
 
 	nvram_unset("wanduck_start_detect");
@@ -12229,7 +12231,7 @@ int init_nvram(void)
 #ifdef RTAX82_XD6
 		add_rc_support("mssid 2.4G 5G update");
 #else
-		add_rc_support("mssid 2.4G 5G usbX1");
+		add_rc_support("mssid 2.4G 5G update usbX1");
 #endif
 		add_rc_support("switchctrl"); // broadcom: for jumbo frame only
 		add_rc_support("manual_stb");
@@ -18877,24 +18879,6 @@ int init_nvram2(void)
 	}
 #endif
 
-#ifdef RTCONFIG_OPENVPN
-/* Initialize OpenVPN state flags */
-
-	for (i = 1; i <= OVPN_CLIENT_MAX; i++) {
-		sprintf(varname, "vpn_client%d_state", i);
-		nvram_set(varname, "0");
-
-		sprintf(varname, "vpn_client%d_errno", i);
-		nvram_set(varname, "0");
-	}
-
-	nvram_set("vpn_server1_state", "0");
-	nvram_set("vpn_server2_state", "0");
-	nvram_set("vpn_server1_errno", "0");
-	nvram_set("vpn_server2_errno", "0");
-	nvram_set("vpn_upload_state", "");
-#endif
-
 /* Remove potentially outdated data */
 	nvram_unset("webs_state_info");
 	nvram_set("webs_state_flag","0");
@@ -19141,6 +19125,10 @@ int init_nvram2(void)
 		nvram_set("ig_guest_client_list", new_ig_guest_cl);
 	}
 #endif /* RTCONFIG_INSTANT_GUARD */
+
+#ifdef RTCONFIG_OPENVPN
+	ovpn_defaults();
+#endif
 
 #if defined(RTCONFIG_IFTTT) || defined(RTCONFIG_ALEXA) || defined(RTCONFIG_GOOGLE_ASST)
 	nvram_set("ifttt_stoken", "");
@@ -19479,9 +19467,6 @@ fa_mode_adjust()
 	) {
 		if (!nvram_match("ctf_disable_force", "1")
 			&& nvram_get_int("ctf_fa_cap")
-#if !defined(HND_ROUTER)
-			&& !nvram_get_int("cstats_enable")
-#endif
 			&& !nvram_match("gmac3_enable", "1")
 			&& !nvram_get_int("qos_enable")
 			&& nvram_match("x_Setting", "1")
@@ -21827,8 +21812,7 @@ _dprintf("%s %d turnning on power on ethernet here\n", __func__, __LINE__);
 #endif
 #if defined(RTCONFIG_BCMARM) && !defined(HND_ROUTER)
 		/* free pagecache */
-		if (nvram_get_int("drop_caches"))
-			f_write_string("/proc/sys/vm/drop_caches", "1", 0, 0);
+		f_write_string("/proc/sys/vm/drop_caches", "1", 0, 0);
 #endif
 #if defined(RTCONFIG_SOC_IPQ40XX)
 		/* free pagecache */
