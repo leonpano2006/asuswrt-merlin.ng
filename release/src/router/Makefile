@@ -6447,10 +6447,10 @@ ifneq ($(wildcard libcap-ng/src/.libs/libdrop_ambient.so.0.0.0),)
 endif
 
 lz4-install:
-	install -D lz4/lib/liblz4.so.1.9.2 $(INSTALLDIR)/lz4/usr/lib/liblz4.so.1.9.2
-	$(STRIP) $(INSTALLDIR)/lz4/usr/lib/liblz4.so.1.9.2
-	cd $(INSTALLDIR)/lz4/usr/lib && ln -sf liblz4.so.1.9.2 liblz4.so.1
-	cd $(INSTALLDIR)/lz4/usr/lib && ln -sf liblz4.so.1.9.2 liblz4.so
+	install -D lz4/lib/liblz4.so.1.10.0 $(INSTALLDIR)/lz4/usr/lib/liblz4.so.1.10.0
+	$(STRIP) $(INSTALLDIR)/lz4/usr/lib/liblz4.so.1.10.0
+	cd $(INSTALLDIR)/lz4/usr/lib && ln -sf liblz4.so.1.10.0 liblz4.so.1
+	cd $(INSTALLDIR)/lz4/usr/lib && ln -sf liblz4.so.1.10.0 liblz4.so
 
 openpam: openpam/Makefile
 	$(MAKE) -C $@ $(PARALLEL_BUILD) && $(MAKE) $@-stage
